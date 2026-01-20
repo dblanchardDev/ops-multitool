@@ -34,9 +34,6 @@ function Write-FullFileSafely {
 
     .PARAMETER Path
     The target file to replace.
-
-    .PARAMETER Encoding
-    Encoding to use (default ASCII for hosts compatibility).
     #>
 
     param(
@@ -46,16 +43,15 @@ function Write-FullFileSafely {
 
 
         [Parameter(Mandatory=$true)]
-        [string] $Path,
-
-        [string] $Encoding = "ASCII"
+        [string] $Path
     )
 
-    $temp = [System.IO.Path]::GetTempFileName()
+    $dir = Split-Path -Path $Path -Parent
+    $temp = [System.IO.Path]::Combine($dir, [System.IO.Path]::GetRandomFileName())
 
     try {
         # 1. Write the full content to a temp file
-        $Lines | Out-File -FilePath $temp -Encoding $Encoding -ErrorAction Stop
+        $Lines | Out-File -FilePath $temp -Encoding ascii -ErrorAction Stop
     }
     catch {
         Remove-Item $temp -ErrorAction SilentlyContinue
@@ -109,7 +105,7 @@ function Add-EntryToHostfile {
     $newLines = Get-Content -LiteralPath $filename -ErrorAction Stop #existing contents
     $newLines += $ip + "`t`t" + $hostname + "`t`t# Hyper-V VM" # add new IP
 
-    Write-FullFileSafely -Lines $newLines -Path $filename -Encoding ASCII
+    Write-FullFileSafely -Lines $newLines -Path $filename
 }
 
 
@@ -131,7 +127,7 @@ function Remove-EntryFromHost {
         $hostname
     )
 
-    $c = Get-Content $filename
+    $c = Get-Content $filename -Encoding Ascii
     $newLines = @()
 
     foreach ($line in $c) {
@@ -154,7 +150,7 @@ function Remove-EntryFromHost {
     }
 
     # Write file
-    Write-FullFileSafely -Lines $newLines -Path $filename -Encoding ASCII
+    Write-FullFileSafely -Lines $newLines -Path $filename
 }
 
 
