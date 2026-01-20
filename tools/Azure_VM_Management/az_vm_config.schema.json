@@ -1,0 +1,33 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema",
+    "$id": "https://gfx.esriservices.ca/gfx-ops-multitool/az-vm-management",
+    "title": "Azure VM Management Configuration",
+
+    "type": "object",
+    "properties": {
+        "$schema": { "type": "string" },
+
+        "machines": {
+            "type": "array",
+            "items": {
+                "$ref": "#/$defs/machine_definition"
+            },
+            "uniqueItems": true
+        }
+    },
+    "required": ["machines"],
+    "additionalProperties": false,
+
+    "$defs": {
+        "machine_definition": {
+            "type": "object",
+            "properties": {
+                "subscription": { "type": "string" },
+                "resourceGroup": { "type": "string" },
+                "computerName": { "type": "string" }
+            },
+            "required": ["subscription", "resourceGroup", "computerName"],
+            "additionalProperties": false
+        }
+    }
+}
